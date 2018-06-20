@@ -1,13 +1,13 @@
 {
-  "name": "pepijnolivier/laravel-bittrex",
+  "name": "dantecoding/laravel-bittrex",
   "description": "Bittrex API wrapper for Laravel",
   "tags": ["bittrex", "api", "laravel"],
   "type": "library",
   "license": "MIT",
   "authors": [
     {
-      "name": "Pepijn Olivier",
-      "email": "olivier.pepijn@gmail.com"
+      "name": "AlexRyabykin",
+      "email": "dante666.18@gmail.com"
     }
   ],
   "require": {
