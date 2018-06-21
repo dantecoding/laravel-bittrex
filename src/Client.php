@@ -46,7 +46,7 @@ class Client implements ClientContract
      * @param array $urls
      * @param array $proxies
      */
-    public function __construct(array $auth, array $urls, array $proxies = [])
+    public function __construct(array $auth, array $urls)
     {
         $this->marketUrl   = array_get($urls, 'market');
         $this->publicUrl   = array_get($urls, 'public');
@@ -55,7 +55,7 @@ class Client implements ClientContract
 
         $this->key     = array_get($auth, 'key');
         $this->secret  = array_get($auth, 'secret');
-        $this->proxies = $proxies;
+        $this->proxies = get_proxies();
     }
 
     /**
