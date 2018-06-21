@@ -1,4 +1,5 @@
 <?php
+
 namespace Pepijnolivier\Bittrex;
 
 class Client implements ClientContract
@@ -34,19 +35,27 @@ class Client implements ClientContract
     private $secret;
 
     /**
+     * @var array
+     */
+    private $proxies;
+
+    /**
      * Client constructor.
      *
      * @param array $auth
      * @param array $urls
+     * @param array $proxies
      */
-    public function __construct(array $auth, array $urls) {
-        $this->marketUrl  = array_get($urls, 'market');
-        $this->publicUrl  = array_get($urls, 'public');
-        $this->publicUrlV2  = array_get($urls, 'publicv2');
-        $this->accountUrl = array_get($urls, 'account');
+    public function __construct(array $auth, array $urls, array $proxies = [])
+    {
+        $this->marketUrl   = array_get($urls, 'market');
+        $this->publicUrl   = array_get($urls, 'public');
+        $this->publicUrlV2 = array_get($urls, 'publicv2');
+        $this->accountUrl  = array_get($urls, 'account');
 
-        $this->key    = array_get($auth, 'key');
-        $this->secret = array_get($auth, 'secret');
+        $this->key     = array_get($auth, 'key');
+        $this->secret  = array_get($auth, 'secret');
+        $this->proxies = $proxies;
     }
 
     /**
@@ -54,7 +63,8 @@ class Client implements ClientContract
      *
      * @return array
      */
-    public function getMarkets() {
+    public function getMarkets()
+    {
         return $this->public('getmarkets');
     }
 
@@ -63,7 +73,8 @@ class Client implements ClientContract
      *
      * @return array
      */
-    public function getCurrencies() {
+    public function getCurrencies()
+    {
         return $this->public('getcurrencies');
     }
 
@@ -73,9 +84,10 @@ class Client implements ClientContract
      * @param string $market a string literal for the market (ex: BTC-LTC)
      * @return array
      */
-    public function getTicker($market) {
+    public function getTicker($market)
+    {
         return $this->public('getticker', [
-            'market' => $market
+            'market' => $market,
         ]);
     }
 
@@ -84,7 +96,8 @@ class Client implements ClientContract
      *
      * @return array
      */
-    public function getMarketSummaries() {
+    public function getMarketSummaries()
+    {
         return $this->public('getmarketsummaries');
     }
 
@@ -93,7 +106,8 @@ class Client implements ClientContract
      *
      * @return array
      */
-    public function getMarketSummariesV2() {
+    public function getMarketSummariesV2()
+    {
         return $this->public('Markets/GetMarketSummaries', [
             // no extra data
         ], 'v2.0');
@@ -105,7 +119,8 @@ class Client implements ClientContract
      * @param string $market a string literal for the market (ex: BTC-LTC)
      * @return array
      */
-    public function getMarketSummary($market) {
+    public function getMarketSummary($market)
+    {
         return $this->public('getmarketsummary', [
             'market' => $market,
         ]);
@@ -119,11 +134,12 @@ class Client implements ClientContract
      * @param int $depth defaults to 20 - how deep of an order book to retrieve. Max is 50
      * @return array
      */
-    public function getOrderBook($market, $type, $depth=20) {
+    public function getOrderBook($market, $type, $depth = 20)
+    {
         return $this->public('getorderbook', [
             'market' => $market,
-            'type' => $type,
-            'depth' => $depth,
+            'type'   => $type,
+            'depth'  => $depth,
         ]);
     }
 
@@ -133,19 +149,21 @@ class Client implements ClientContract
      * @param string $market a string literal for the market (ex: BTC-LTC)
      * @return array
      */
-    public function getMarketHistory($market) {
+    public function getMarketHistory($market)
+    {
         return $this->public('getmarkethistory', [
             'market' => $market,
         ]);
     }
 
-    public function getValidChartDataTickIntervals() {
+    public function getValidChartDataTickIntervals()
+    {
         $validTickIntervals = [
-            '60' => 'oneMin',
-            '300' => 'fiveMin',
+            '60'    => 'oneMin',
+            '300'   => 'fiveMin',
             // fifteenMin
-            '1800' => 'thirtyMin',
-            '3600' => 'hour',
+            '1800'  => 'thirtyMin',
+            '3600'  => 'hour',
             '86400' => 'day',
             // threeDays
             // week
@@ -164,12 +182,13 @@ class Client implements ClientContract
      * @param string $tickInterval
      * @return mixed
      */
-    public function getChartData($marketName, $tickInterval='hour') {
+    public function getChartData($marketName, $tickInterval = 'hour')
+    {
         $timestamp = strtotime('now');
         return $this->public('market/GetTicks', [
-            'marketName' => $marketName,
+            'marketName'   => $marketName,
             'tickInterval' => $tickInterval,
-            '_' => $timestamp,
+            '_'            => $timestamp,
         ], 'v2.0');
     }
 
@@ -183,11 +202,12 @@ class Client implements ClientContract
      *
      * @return array Returns you the order uuid
      */
-    public function buyLimit($market, $quantity, $rate) {
+    public function buyLimit($market, $quantity, $rate)
+    {
         return $this->market('buylimit', [
-            'market' => $market,
+            'market'   => $market,
             'quantity' => $quantity,
-            'rate' => $rate,
+            'rate'     => $rate,
         ]);
     }
 
@@ -202,11 +222,12 @@ class Client implements ClientContract
      * @return array Returns you the order uuid
      *
      */
-    public function sellLimit($market, $quantity, $rate) {
+    public function sellLimit($market, $quantity, $rate)
+    {
         return $this->market('selllimit', [
-            'market' => $market,
+            'market'   => $market,
             'quantity' => $quantity,
-            'rate' => $rate,
+            'rate'     => $rate,
         ]);
     }
 
@@ -216,7 +237,8 @@ class Client implements ClientContract
      * @param string $uuid uuid of buy or sell order
      * @return array
      */
-    public function cancelOrder($uuid) {
+    public function cancelOrder($uuid)
+    {
         return $this->market('cancel', [
             'uuid' => $uuid,
         ]);
@@ -228,7 +250,8 @@ class Client implements ClientContract
      * @param string|null $market a string literal for the market (ie. BTC-LTC)
      * @return array
      */
-    public function getOpenOrders($market=null) {
+    public function getOpenOrders($market = null)
+    {
         return $this->market('getopenorders', [
             'market' => $market,
         ]);
@@ -239,7 +262,8 @@ class Client implements ClientContract
      *
      * @return array
      */
-    public function getBalances() {
+    public function getBalances()
+    {
         return $this->account('getbalances');
     }
 
@@ -249,7 +273,8 @@ class Client implements ClientContract
      * @param string $currency a string literal for the currency (ex: LTC)
      * @return array
      */
-    public function getBalance($currency) {
+    public function getBalance($currency)
+    {
         return $this->account('getbalance', [
             'currency' => $currency,
         ]);
@@ -262,7 +287,8 @@ class Client implements ClientContract
      * @param string $currency a string literal for the currency (ex: LTC)
      * @return array
      */
-    public function getDepositAddress($currency) {
+    public function getDepositAddress($currency)
+    {
         return $this->account('getdepositaddress', [
             'currency' => $currency,
         ]);
@@ -278,11 +304,12 @@ class Client implements ClientContract
      * @param string $paymentId used for CryptoNotes/BitShareX/Nxt optional field (memo/paymentid)
      * @return array Returns you the withdrawal uuid
      */
-    public function withdraw($currency, $quantity, $address, $paymentId=null) {
+    public function withdraw($currency, $quantity, $address, $paymentId = null)
+    {
         return $this->account('withdraw', [
-            'currency' => $currency,
-            'quantity' => $quantity,
-            'address' => $address,
+            'currency'  => $currency,
+            'quantity'  => $quantity,
+            'address'   => $address,
             'paymentid' => $paymentId,
         ]);
     }
@@ -293,7 +320,8 @@ class Client implements ClientContract
      * @param string $uuid the uuid of the buy or sell order
      * @return array
      */
-    public function getOrder($uuid) {
+    public function getOrder($uuid)
+    {
         return $this->account('getorder', [
             'uuid' => $uuid,
         ]);
@@ -305,7 +333,8 @@ class Client implements ClientContract
      * @param string|null $market
      * @return array
      */
-    public function getOrderHistory($market=null) {
+    public function getOrderHistory($market = null)
+    {
         return $this->account('getorderhistory', [
             'market' => $market,
         ]);
@@ -317,7 +346,8 @@ class Client implements ClientContract
      * @param string| null $currency a string literal for the currecy (ie. BTC). If omitted, will return for all currencies
      * @return array
      */
-    public function getWithdrawalHistory($currency=null) {
+    public function getWithdrawalHistory($currency = null)
+    {
         return $this->account('getwithdrawalhistory', [
             'currency' => $currency,
         ]);
@@ -329,7 +359,8 @@ class Client implements ClientContract
      * @param string| null $currency a string literal for the currecy (ie. BTC). If omitted, will return for all currencies
      * @return array
      */
-    public function getDepositHistory($currency=null) {
+    public function getDepositHistory($currency = null)
+    {
         return $this->account('getdeposithistory', [
             'currency' => $currency,
         ]);
@@ -343,18 +374,32 @@ class Client implements ClientContract
      * @param array $parameters
      * @return array
      */
-    function public ($segment, array $parameters=[], $version='v1.1') {
-        $options = [
-            'http' => [
-                'method'  => 'GET',
-                'timeout' => 10,
-            ],
-        ];
-
+    function public($segment, array $parameters = [], $version = 'v1.1')
+    {
         $publicUrl = $this->getPublicUrl($version);
-        $url = $publicUrl . $segment . '?' . http_build_query(array_filter($parameters));
-        $feed = file_get_contents($url, false, stream_context_create($options));
-        return json_decode($feed, true);
+        $url       = $publicUrl . $segment . '?' . http_build_query(array_filter($parameters));
+
+        $ch   = curl_init($url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT,
+            'Mozilla/4.0 (compatible; Bittrex PHP-Laravel Client; ' . php_uname('a') . '; PHP/' . phpversion() . ')'
+        );
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+        // proxy settings
+        if (is_array($this->proxies) && !empty($this->proxies)) {
+            $proxy = $this->proxies[array_rand($this->proxies)];
+            curl_setopt($ch, CURLOPT_PROXY, $proxy['protocol'] . '://' . $proxy['address'] . ':' . $proxy['port']);
+            if ($proxy['user'] && $proxy['password']) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['user'] . ':' . $proxy['password']);
+            }
+        }
+
+        $execResult = curl_exec($ch);
+        $res        = json_decode($execResult, true);
+
+        return $res;
     }
 
     /**
@@ -364,7 +409,8 @@ class Client implements ClientContract
      * @param array $parameters
      * @return array
      */
-    public function market($segment, array $parameters=[]) {
+    public function market($segment, array $parameters = [])
+    {
         $baseUrl = $this->marketUrl;
         return $this->nonPublicRequest($baseUrl, $segment, $parameters);
     }
@@ -376,7 +422,8 @@ class Client implements ClientContract
      * @param array $parameters
      * @return array
      */
-    public function account($segment, array $parameters=[]) {
+    public function account($segment, array $parameters = [])
+    {
         $baseUrl = $this->accountUrl;
         return $this->nonPublicRequest($baseUrl, $segment, $parameters);
     }
@@ -391,15 +438,16 @@ class Client implements ClientContract
      * @param array $parameters
      * @return array
      */
-    protected function nonPublicRequest($baseUrl, $segment, $parameters=[]) {
+    protected function nonPublicRequest($baseUrl, $segment, $parameters = [])
+    {
         $parameters = array_merge(array_filter($parameters), [
             'apiKey' => $this->key,
-            'nonce' => time()
+            'nonce'  => time(),
         ]);
 
-        $uri = $baseUrl . $segment . '?' . http_build_query($parameters);
+        $uri  = $baseUrl . $segment . '?' . http_build_query($parameters);
         $sign = hash_hmac('sha512', $uri, $this->secret);
-        $ch = curl_init($uri);
+        $ch   = curl_init($uri);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "apisign:$sign",
         ]);
@@ -409,14 +457,23 @@ class Client implements ClientContract
             'Mozilla/4.0 (compatible; Bittrex PHP-Laravel Client; ' . php_uname('a') . '; PHP/' . phpversion() . ')'
         );
 
+        // proxy settings
+        if (is_array($this->proxies) && !empty($this->proxies)) {
+            $proxy = $this->proxies[array_rand($this->proxies)];
+            curl_setopt($ch, CURLOPT_PROXY, $proxy['protocol'] . '://' . $proxy['address'] . ':' . $proxy['port']);
+            if ($proxy['user'] && $proxy['password']) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['user'] . ':' . $proxy['password']);
+            }
+        }
+
         $execResult = curl_exec($ch);
-        $res = json_decode($execResult, true);
+        $res        = json_decode($execResult, true);
         return $res;
     }
 
     private function getPublicUrl($version)
     {
-        switch($version) {
+        switch ($version) {
             case 'v1.1':
                 return $this->publicUrl;
             case 'v2.0':

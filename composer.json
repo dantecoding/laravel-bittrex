@@ -1,12 +1,13 @@
 {
   "name": "dantecoding/laravel-bittrex",
+  "version": "1.0.2",
   "description": "Bittrex API wrapper for Laravel",
   "tags": ["bittrex", "api", "laravel"],
   "type": "library",
   "license": "MIT",
   "authors": [
     {
-      "name": "AlexRyabykin",
+      "name": "Alex Ryabykin",
       "email": "dante666.18@gmail.com"
     }
   ],
