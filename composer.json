@@ -1,6 +1,6 @@
 {
   "name": "dantecoding/laravel-bittrex",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bittrex API wrapper for Laravel",
   "tags": ["bittrex", "api", "laravel"],
   "type": "library",
